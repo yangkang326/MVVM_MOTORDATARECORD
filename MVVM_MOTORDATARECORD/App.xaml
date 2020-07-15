@@ -1,0 +1,11 @@
+﻿<Application
+    x:Class="MVVM_MOTORDATARECORD.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:MVVM_MOTORDATARECORD"
+    StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary />
+    </Application.Resources>
+</Application>

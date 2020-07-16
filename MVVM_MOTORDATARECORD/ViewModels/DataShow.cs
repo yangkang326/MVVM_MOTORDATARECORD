@@ -18,6 +18,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
     {
         private ISheet recordsheet;
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public DataShow()
         {
             _MyMeter = new Meterdata();
@@ -84,6 +87,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             set { _SelectParity = value; RaisePropertyChanged(() => SelectParity); }
         }
 
+        /// <summary>
+        /// 初始化串口参数
+        /// </summary>
         public void ConnectComPort()
         {
             if (!_MyComPort.IsOpen)
@@ -107,6 +113,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
 
         private Thread th;
 
+        /// <summary>
+        /// 定时发送仪表指令
+        /// </summary>
         private void sendcmd()
         {
             while (_MyComPort.IsOpen)
@@ -117,6 +126,10 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             th.Abort();
         }
 
+        /// <summary>
+        /// 串口发送HEX 字符串
+        /// </summary>
+        /// <param name="datastr">写报文内容</param>
         public void writedata(string datastr)
         {
             byte[] array = SoftBasic.HexStringToBytes(datastr);
@@ -127,6 +140,11 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             catch { }
         }
 
+        /// <summary>
+        /// 串口接收报文解析
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComPortdata(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> buffer = new List<byte>();
@@ -146,6 +164,7 @@ namespace MVVM_MOTORDATARECORD.ViewModels
                     byte[] buffer2 = new byte[recCount];
                     Array.Copy(data, 0, buffer2, 0, recCount);
                     buffer.AddRange(buffer2);
+                    _MyComPort.DiscardInBuffer();
                 }
                 catch
                 {
@@ -153,7 +172,7 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             }
 
             if (buffer.Count == 0) return;
-            if (buffer.Count > 13)
+            if (buffer.Count > 12)
             {
                 bool check1 = true, check2 = true, check3 = true;
                 _Portdata = string.Empty;
@@ -237,7 +256,7 @@ namespace MVVM_MOTORDATARECORD.ViewModels
                     {
                         nRow++;
                         float temp = ((float)(Convert.ToInt16("0x" + stringarrary[5], 16) + Convert.ToInt16("0x" + stringarrary[4], 16) * 256)) / njx;
-                        if (Math.Abs(temp) < 60)
+                        if (Math.Abs(temp) < 200)
                         {
                             _MyMeter.MyTroque = temp;
                         }
@@ -249,7 +268,7 @@ namespace MVVM_MOTORDATARECORD.ViewModels
                         }
 
                         float temp2 = ((float)(Convert.ToInt16("0x" + stringarrary[11], 16) + Convert.ToInt16("0x" + stringarrary[10], 16) * 256)) / glx;
-                        if (Math.Abs(temp2) < 10000)
+                        if (Math.Abs(temp2) < 15000)
                         {
                             _MyMeter.MyPower = temp2;
                         }
@@ -259,7 +278,6 @@ namespace MVVM_MOTORDATARECORD.ViewModels
                         row.CreateCell(2).SetCellValue(_MyMeter.MySpeed.ToString());
                         row.CreateCell(3).SetCellValue(_MyMeter.MyPower.ToString());
                     }
-                    _MyComPort.DiscardInBuffer();
                 }
             }
         }
@@ -296,6 +314,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
 
         private string strWriteFilePath;
 
+        /// <summary>
+        /// 创建新表格
+        /// </summary>
         public void Creattable()
         {
             if (!exelcreated)
@@ -323,6 +344,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             }
         }
 
+        /// <summary>
+        /// 加载记录表格的转速扭矩功率关系曲线
+        /// </summary>
         public void Getrecord()
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -381,6 +405,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
             }
         }
 
+        /// <summary>
+        /// 获取本次记录的关系数据曲线
+        /// </summary>
         public void Getthisrecord()
         {
             double[][] v1;
@@ -434,6 +461,9 @@ namespace MVVM_MOTORDATARECORD.ViewModels
                 .WithQuality(Quality.Low);
         }
 
+        /// <summary>
+        /// 退出程序
+        /// </summary>
         public void Exit()
         {
             if (_MyComPort != null)
